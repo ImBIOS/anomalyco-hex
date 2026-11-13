@@ -59,7 +59,7 @@ Feature             Pane  Toggle (settings.json, hex settings)   On: what it doe
 ├── Keep recordings no    labs.keep_recordings         History entries keep their dictation audio; Transcribe again runs it through another installed model (#1032)
 ├── Hide menu bar icon no labs.hide_menu_bar_icon      (macOS) the menu-bar icon hides while no meeting is under way; shortcuts keep working, reopening Hex shows Settings (#1064)
 ├── Notch indicator no    labs.notch_indicator         (macOS) with the indicator at Top, the notch widens sideways in the Dynamic Island's compact style: an orange mic and level bars, the macOS spinner, a green checkmark; flat screens keep it below the menu bar
-├── Movable meeting capsules no labs.movable_meeting_capsules (macOS) panel capsules (Meeting transcript ready, Recording automatically, offers, reminders) drag to another corner and show in the last one, shared with the recording capsule (#1093)
+├── Movable meeting capsules no labs.movable_meeting_capsules panel capsules (Meeting transcript ready, Recording automatically, offers, reminders) drag to another corner and show in the last one, shared with the recording capsule (#1093)
 ├── Choose meeting summary model no labs.meeting_summary_model + meetings.opencode_model (every OS with Meetings)
 │                                        OpenCode meeting notes use exactly that provider/model, no fallback; Meetings › Settings › Advanced shows its field (#1107)
 ├── Vocabulary in meeting notes no labs.meeting_notes_vocabulary (every OS with Meetings)
@@ -876,8 +876,8 @@ dictation through the ears on a Mac with the lab on (`hex dev hud` drives
 them in a debug build), and the failure glyph, which no render covers yet; the
 row renders only in macOS builds, so no golden changes.
 
-Movable meeting capsules (`movable-meeting-capsules`, issue 1093, macOS
-like Meetings; its row shows wherever Meetings does, in macOS builds): for
+Movable meeting capsules (`movable-meeting-capsules`, issue 1093; every
+OS with Meetings; its row shows wherever Meetings does): for
 panel capsules that sit over another app's window controls or toolbar. The
 gate, `labs::movable_meeting_capsules()`, is read each time a panel capsule
 shows (`MeetingCapsules::show_panel` in
@@ -896,8 +896,10 @@ through the panel outside its buttons. Checks:
 `only_a_movable_panel_drags` in
 [rune_ui/meeting_capsules.rs](../../src/rune_ui/meeting_capsules.rs);
 `movable_meeting_capsules_is_its_own_bit_and_off_by_default` in
-[labs.rs](../../src/labs.rs). Not yet observed: a drag on a real Mac; the
-row renders only in macOS builds, so no golden changes.
+[labs.rs](../../src/labs.rs). The snap reads the primary screen on every OS
+(X11's root window size, `GetSystemMetrics` on Windows); on Wayland, where
+an app learns no display size, a dragged capsule stays in its corner. Not
+yet observed: a drag on a real machine.
 
 Choose meeting summary model (`meeting-summary-model`, issue 1107; macOS,
 Linux, and Windows since issue 1160; its row shows wherever Meetings does):

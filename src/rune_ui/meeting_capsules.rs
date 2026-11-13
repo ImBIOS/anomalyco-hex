@@ -354,10 +354,54 @@ fn primary_screen_size() -> Option<(f32, f32)> {
     Some((size.width as f32, size.height as f32))
 }
 
-/// Linux and Windows leave a dragged capsule in its corner.
-#[cfg(not(target_os = "macos"))]
+/// The primary screen in points, where Rune places the capsules: the X11
+/// root window's size, or the primary monitor on Windows. A drag ending on
+/// another display still snaps to a corner of the screen Rune placed it on.
+/// `None` where no display answers (Wayland tells an app nothing of the
+/// displays, so a dragged capsule stays in its corner there).
+#[cfg(target_os = "linux")]
 fn primary_screen_size() -> Option<(f32, f32)> {
-    None
+    linux_primary_screen_size()
+}
+
+/// The primary screen in points, where Rune places the capsules: the
+/// primary monitor's size. A drag ending on another display still snaps to
+/// a corner of the screen Rune placed it on.
+#[cfg(target_os = "windows")]
+fn primary_screen_size() -> Option<(f32, f32)> {
+    windows_primary_screen_size()
+}
+
+#[cfg(target_os = "linux")]
+fn linux_primary_screen_size() -> Option<(f32, f32)> {
+    use x11rb::connection::Connection as _;
+    // XWayland answers for its own root window, so this is a screen Rune
+    // could have placed the capsule on; on Wayland itself there is no X
+    // server at all.
+    let (connection, screen) = x11rb::connect(None).ok()?;
+    let size = connection.setup().roots.get(screen)?;
+    (size.width_in_pixels > 0 && size.height_in_pixels > 0).then(|| {
+        (
+            f32::from(size.width_in_pixels),
+            f32::from(size.height_in_pixels),
+        )
+    })
+}
+
+#[cfg(target_os = "windows")]
+fn windows_primary_screen_size() -> Option<(f32, f32)> {
+    // GDI's virtual screen is pixels; Rune points are physical ones.
+    let width = unsafe {
+        windows_sys::Win32::UI::WindowsAndMessaging::GetSystemMetrics(
+            windows_sys::Win32::UI::WindowsAndMessaging::SM_CXSCREEN,
+        )
+    };
+    let height = unsafe {
+        windows_sys::Win32::UI::WindowsAndMessaging::GetSystemMetrics(
+            windows_sys::Win32::UI::WindowsAndMessaging::SM_CYSCREEN,
+        )
+    };
+    (width > 0 && height > 0).then_some((width as f32, height as f32))
 }
 
 fn place_capsule(

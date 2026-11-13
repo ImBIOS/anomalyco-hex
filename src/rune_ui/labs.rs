@@ -234,7 +234,9 @@ fn rows(ui: &Ui) -> Vec<Row> {
                 tr("Stop when the call ends"),
                 tr("Stop a recording Hex started on its own 30 s after the call app leaves the microphone and goes quiet"),
             ));
-            // Only macOS's capsules know the screen to snap a drag against.
+            // The capsules snap a drag against the primary screen (on
+            // Wayland, where an app learns no display size, a dragged
+            // capsule stays in its corner).
             rows.push(row(
                 Feature::MovableMeetingCapsules,
                 &HINTS,

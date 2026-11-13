@@ -456,7 +456,10 @@ Record (offer, menu bar "Record Meeting", Meetings pane, or voice command)
      ├── Hover -> widens toward the screen with the actions below; pointer
      │   leaving -> eases back to compact (a held press keeps it open)
      ├── Drag -> follows the pointer; release -> snaps to the corner nearest
-     │   its centre and saves recording_indicator_corner (window settings too)
+     │   its centre and saves recording_indicator_corner (window settings too);
+     │   on X11 and Windows it snaps against the primary screen, which is
+     │   where Rune puts it; on Wayland, where an app learns no display
+     │   size, it stays in its corner
      ├── Copy new (N) -> copies the turns not yet copied or pasted, through
      │   the click (see meetings.copy-through-now)
      │   ├── Shares Option-Control-V's cursor: either one advances both
